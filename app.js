@@ -1,11 +1,4 @@
-const fs = require('fs');
-const path = require('path');
-
-const rootEnv = path.join(__dirname, '.env');
-const serviceEnv = path.join(__dirname, 'services', '.env');
-const envPath = fs.existsSync(rootEnv) ? rootEnv : serviceEnv;
-
-require('dotenv').config({ path: envPath });
+require('dotenv').config();
 
 const express = require('express');
 const db = require('./config/db');
@@ -24,13 +17,14 @@ app.get('/', (req, res) => {
 async function startServer() {
   try {
     await db.connect();
-  } catch (error) {
-    console.warn('Database startup check failed:', error.message);
-  }
 
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Server startup failed:', error.message);
+    process.exitCode = 1;
+  }
 }
 
 startServer();

@@ -3,19 +3,16 @@ const mongoose = require('mongoose');
 class DB {
     async connect() {
         if (!process.env.MONGO_URI) {
-            console.warn('MongoDB URI is not configured. Starting server without DB connection.');
-            return false;
+            throw new Error('MONGO_URI is not set. Add your MongoDB connection string to the root .env file.');
         }
 
         try {
             await mongoose.connect(process.env.MONGO_URI, {
-                serverSelectionTimeoutMS: 3000
+                serverSelectionTimeoutMS: 10000
             });
             console.log('MongoDB Connected');
-            return true;
         } catch (error) {
-            console.warn('MongoDB connection failed:', error.message);
-            return false;
+            throw new Error(`MongoDB connection failed: ${error.message}`, { cause: error });
         }
     }
 }
